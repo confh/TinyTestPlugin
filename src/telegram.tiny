@@ -1,0 +1,55 @@
+import plugin "../plugins/telegram" as _telegram
+
+export class Bot {
+    field handle: any = null
+
+    fn init(config: object) {
+        const result = _telegram.new(config);
+        this.handle = result.handle;
+    }
+
+    fn start() {
+        return _telegram.start({
+            handle: this.handle
+        });
+    }
+
+    fn stop() {
+        return _telegram.stop({
+            handle: this.handle
+        });
+    }
+
+    fn nextEvent(): object {
+        return _telegram.nextEvent({
+            handle: this.handle
+        });
+    }
+
+    fn pollEvent() {
+        return _telegram.pollEvent({
+            handle: this.handle
+        });
+    }
+
+    fn sendMessage(chatID, text) {
+        return _telegram.sendMessage({
+            handle: this.handle,
+            chatID: chatID,
+            text: text
+        });
+    }
+
+    fn reply(event, text) {
+        return _telegram.reply({
+            handle: this.handle,
+            chatID: event.chatID,
+            messageID: event.messageID,
+            text: text
+        });
+    }
+}
+
+export fn new(config) {
+    return Bot(config);
+}
