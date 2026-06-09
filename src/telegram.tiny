@@ -1,39 +1,73 @@
-import plugin "../plugins/telegram" as _telegram
+import plugin "../plugins/telegram" as tgPlugin
+
+export interface ChatEvent {
+    chatID: number,
+    chatTitle: string,
+    chatType: string,
+    chatUsername: string,
+    date: number,
+    fromFirstName: string,
+    fromID: number,
+    fromIsBot: bool,
+    fromLastName: string,
+    fromUsername: string,
+    messageID: number,
+    text: string,
+    type: string
+}
+
+export interface Config {
+    token: string
+}
 
 export class Bot {
-    field handle: any = null
+    field private handle: any = null
+    field private handler: function | null = null
 
-    fn init(config: object) {
-        const result = _telegram.new(config);
+    fn init(config: Config) {
+        const result = tgPlugin.new(config);
         this.handle = result.handle;
     }
 
+    fn setHandler(handler: function) {
+        this.handler = handler
+    }
+
     fn start() {
-        return _telegram.start({
+        tgPlugin.start({
             handle: this.handle
         });
+
+        while true {
+            const event: ChatEvent = this.nextEvent()
+            const eventClass = Event(this, event)
+
+            if this.handler {
+                this.handler(eventClass)
+            }
+        }
     }
 
     fn stop() {
-        return _telegram.stop({
+        return tgPlugin.stop({
             handle: this.handle
         });
     }
 
-    fn nextEvent(): object {
-        return _telegram.nextEvent({
+    fn nextEvent(): ChatEvent {
+        return tgPlugin.nextEvent({
             handle: this.handle
         });
     }
 
     fn pollEvent() {
-        return _telegram.pollEvent({
+        return tgPlugin.pollEvent({
             handle: this.handle
         });
     }
 
-    fn sendMessage(chatID, text) {
-        return _telegram.sendMessage({
+    fn sendMessage(chatID: number, text: string) {
+        return tgPlugin.sendMessage({
             handle: this.handle,
             chatID: chatID,
             text: text
@@ -41,7 +75,7 @@ export class Bot {
     }
 
     fn reply(event, text) {
-        return _telegram.reply({
+        return tgPlugin.reply({
             handle: this.handle,
             chatID: event.chatID,
             messageID: event.messageID,
@@ -50,6 +84,16 @@ export class Bot {
     }
 }
 
-export fn new(config) {
-    return Bot(config);
+export class Event {
+    field bot?: Bot = null
+    field data?: ChatEvent  = null
+
+    fn init(bot: Bot, data: ChatEvent) {
+        this.bot = bot
+        this.data = data
+    }
+
+    fn reply(text: string) {
+        this.bot?.sendMessage(this.data?.chatID, text)
+    }
 }

@@ -1,0 +1,18 @@
+import "../src/telegram.tiny" as tg
+import std "io";
+
+const token = "YOUR_TELEGRAM_BOT_TOKEN"
+
+const bot = tg.Bot({
+    token: "token"
+})
+
+bot.setHandler(fn(event: tg.Event) {
+    if event.data?.text == "/start" {
+        event.reply("Hello from tiny!")
+    }
+})
+
+io.println("Bot started!")
+
+bot.start()

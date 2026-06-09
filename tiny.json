@@ -8,7 +8,8 @@
     "build": "tiny build",
     "dist": "tiny dist",
     "pack": "tiny pack",
-    "start": "tiny run"
+    "start": "tiny run",
+    "test": "tiny examples/main.tiny"
   },
   "dependencies": {},
   "plugins": [
